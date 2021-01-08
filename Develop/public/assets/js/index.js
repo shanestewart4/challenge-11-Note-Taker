@@ -31,7 +31,12 @@ const getNotes = () =>
     headers: {
       'Content-Type': 'application/json',
     },
-  });
+  })
+  .then(response => {
+    // console.log(response);
+    return response;
+  })
+;
 
 const saveNote = (note) =>
   fetch('/api/notes', {
@@ -57,6 +62,7 @@ const renderActiveNote = () => {
     noteTitle.setAttribute('readonly', true);
     noteText.setAttribute('readonly', true);
     noteTitle.value = activeNote.title;
+    noteText.value = activeNote.title;
     noteText.value = activeNote.text;
   } else {
     noteTitle.value = '';

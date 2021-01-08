@@ -1,50 +1,67 @@
 // link routes to journal data.
+const notes = require('../Develop/db/db.json')
 const fs = require('fs');
-const journalData = require('../data/journalData');
-
+const uuid = require('uuidv4')
 const router = require('express').Router();
-
-
 
 // commence routing
 
+// GET
+router.get('/notes', function (req,res) {
+    res.json(notes);
+});
+// POST
+router.post('/notes', function (req,res) {
+    let noteId = uuid;
+    let newNote = {
+        id: noteId,
+        title: req.body.title,
+        text: req.body.text
+    };
+    console.log('new note', newNote);
+    console.log('notes', notes);
 
-module.exports = function (router) {
-    // GET
-    router.get('/api/journals', function (req,res) {
-        res.json(journalData);
+    notes.push(newNote);
+
+    res.status(200).json(newNote);
+
+    // fs.readFile('./Develop/db/db.json', "utf8" , (err, data) => {
+    //     if (err) throw err;
+
+    //     const allNotes = JSON.parse(data);
+    //     allNotes.push(newNote);
+
+    //     // stringfy data
+    //     //const dataString = JSON.stringify(dbData);
+    //     // write data to file
+    //     fs.writeFile('./Develop/db/db.json', JSON.stringify(allNotes, null, 2) , err => {
+    //         if (err) throw err;
+    //         res.send(db);
+    //         console.log('New note generated!')
+    //     });
+    // });
+});
+// DELETE
+
+router.delete('/notes/:id', (req, res) => {
+    let noteId = req.params.id;
+    fs.readFile("../Develop/db/db.json", "utf8" , (err, data) => {
+        if (err) throw err;
+
+        const allNotes = JSON.parse(data);
+        const newAllNotes = allNotes.filter(note => note.id != noteId);
+
+        fs.writeFile("../Develop/db/db.json", JSON.stringify(newAllNotes, null, 2), err => {
+            if (err) throw err;
+            res.send(db);
+            console.log("Note successfully removed!");
+        });
     });
-    // POST
-    router.post('/api/journals', function (req,res) {
-        journalData.push(req.body);
-        res.json('saved');
-    })
-    // DELETE
-
-    router.delete('/api/journals/:index', function (req, res) {
-        const elem = parseInt(req.params.index);
-        const temporaryJournal = [];
-        // for loop through journalData
-        for (let i = 0; i < journalData.length; i++) {
-            if (i !== elem) {
-                temporaryJournal.push(journalData[i]);
-            }
-        }
-        
-        journalData = temporaryJournal;
-
-        res.json('delete complete');
-
-
-    })
+});
 
 
 
-
-}
-
-
-
+module.exports = router;
 
 
 
